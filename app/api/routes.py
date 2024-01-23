@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template
 from app.helpers import token_required
-from app.models import db, User, Car, contact_schema, contacts_schema
+from app.models import db, User, Car, cars_schema, cars_schema
 
 api = Blueprint('api',__name__, url_prefix='/api')
 
@@ -25,7 +25,7 @@ def create_car(current_user_token):
     db.session.add(car)
     db.session.commit()
 
-    response = contact_schema.dump(car)
+    response = cars_schema.dump(car)
     return jsonify(response)
 
 
@@ -34,14 +34,14 @@ def create_car(current_user_token):
 def get_cars(current_user_token):
     a_user = current_user_token.token
     cars= Car.query.filter_by(user_token = a_user).all()
-    response = contacts_schema.dump(cars)
+    response = cars_schema.dump(cars)
     return jsonify(response)
 
 @api.route('/cars/<id>', methods = ['GET'])
 @token_required
 def get_single_car(current_user_token,id):
     car = Car.query.get(id)
-    response = contact_schema.dump(car)
+    response = cars_schema.dump(car)
     return jsonify(response)
 
 
@@ -56,14 +56,16 @@ def update_car(current_user_token,id):
     car.user_token = current_user_token.token
 
     db.session.commit()
-    response = contact_schema.dump(car)
+    response = cars_schema.dump(car)
     return jsonify(response)
 
 @api.route('/cars/<id>', methods = ['DELETE'])
 @token_required
 def delete_car(current_user_token, id):
     car = Car.query.get(id)
+    if car.user_token!=current_user_token.token:
+        return {"error":"This car does not belong to you"}
     db.session.delete(car)
     db.session.commit()
-    response = contact_schema.dump(car)
+    response = cars_schema.dump(car)
     return jsonify(response)

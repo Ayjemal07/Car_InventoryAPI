@@ -71,9 +71,9 @@ class Car(db.Model):
     def set_id(self):
         return (secrets.token_urlsafe())
 
-class ContactSchema(ma.Schema):
+class CarsSchema(ma.Schema):
     class Meta:
         fields = ['id', 'make','year','model', 'features']
 
-contact_schema = ContactSchema()
-contacts_schema = ContactSchema(many=True)
+cars_schema = CarsSchema()
+cars_schema = CarsSchema(many=True)
