@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template
 from app.helpers import token_required
-from app.models import db, User, Car, cars_schema, cars_schema
+from app.models import db, User, Car, car_schema, cars_schema
 
 api = Blueprint('api',__name__, url_prefix='/api')
 
@@ -25,7 +25,7 @@ def create_car(current_user_token):
     db.session.add(car)
     db.session.commit()
 
-    response = cars_schema.dump(car)
+    response = car_schema.dump(car)
     return jsonify(response)
 
 
@@ -41,7 +41,7 @@ def get_cars(current_user_token):
 @token_required
 def get_single_car(current_user_token,id):
     car = Car.query.get(id)
-    response = cars_schema.dump(car)
+    response = car_schema.dump(car)
     return jsonify(response)
 
 
@@ -56,7 +56,7 @@ def update_car(current_user_token,id):
     car.user_token = current_user_token.token
 
     db.session.commit()
-    response = cars_schema.dump(car)
+    response = car_schema.dump(car)
     return jsonify(response)
 
 @api.route('/cars/<id>', methods = ['DELETE'])
@@ -67,5 +67,5 @@ def delete_car(current_user_token, id):
         return {"error":"This car does not belong to you"}
     db.session.delete(car)
     db.session.commit()
-    response = cars_schema.dump(car)
+    response = car_schema.dump(car)
     return jsonify(response)
